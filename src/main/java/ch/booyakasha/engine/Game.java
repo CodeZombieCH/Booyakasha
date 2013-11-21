@@ -66,6 +66,9 @@ public class Game extends Canvas implements IGame {
 		player = new AliGEntity(this, "sprites/alig.gif", 370, 550);
 		entities.add(player);
 		
+		Entity front = new Background("sprites/front.jpg", 0, 0);
+		entities.add(front);
+		
 		// Create enemies
 		for(int row = 0; row < 5; row++) {
 			for(int x = 0; x < 12; x++) {
@@ -99,6 +102,8 @@ public class Game extends Canvas implements IGame {
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
 			g.setColor(Color.black);
 			g.fillRect(0, 0, 800, 600);
+			g.setColor(Color.gray);
+			g.fillRect(0, 400, 800, 140);
 			
 			// Let entities move
 			for(int i = 0; i < entities.size(); i++) {
