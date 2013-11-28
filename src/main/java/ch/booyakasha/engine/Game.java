@@ -76,7 +76,7 @@ public class Game extends Canvas implements IGame {
 		entities.add(front);
 		
 		// Create enemies
-		Entity enemy = new EnemyEntity(this, "sprites/enemy.gif", 0, 360);
+		Entity enemy = new EnemyEntity(this, "sprites/gangster.png", 0, 290);
 		entities.add(enemy);
 	}
 	
