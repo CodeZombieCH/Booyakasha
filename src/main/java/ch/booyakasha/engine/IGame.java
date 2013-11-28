@@ -5,4 +5,9 @@ public interface IGame {
 	 * Request update of the game logic
 	 */
 	void updateLogic();
+	
+	/**
+	 * getWindowXLocation
+	 */
+	int getPanelLocationX();
 }

@@ -18,6 +18,7 @@ public class Game extends Canvas implements IGame {
 	private boolean gameRunning = true;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private Entity player;
+	private JPanel panel;
 	
 	/** True if game logic needs to be applied this loop, normally as a result of a game event */
 	private boolean logicRequiredThisLoop = false;
@@ -28,7 +29,7 @@ public class Game extends Canvas implements IGame {
 	public Game() {
 		JFrame container = new JFrame("Booyakasha");
 		
-		JPanel panel = (JPanel)container.getContentPane();
+		panel = (JPanel)container.getContentPane();
 		panel.setPreferredSize(new Dimension(800, 600));
 		panel.setLayout(null);
 		
@@ -53,6 +54,10 @@ public class Game extends Canvas implements IGame {
 		startGame();
 	}
 	
+	public int getPanelLocationX() {
+		return (int)panel.getLocationOnScreen().getX();
+	}
+	
 	/**
 	 * Starts a new game
 	 */
@@ -66,16 +71,13 @@ public class Game extends Canvas implements IGame {
 		player = new AliGEntity(this, "sprites/alig.gif", 370, 550);
 		entities.add(player);
 		
+		// Insert background
 		Entity front = new Background("sprites/front.jpg", 0, 0);
 		entities.add(front);
 		
 		// Create enemies
-		for(int row = 0; row < 5; row++) {
-			for(int x = 0; x < 12; x++) {
-				Entity enemy = new EnemyEntity(this, "sprites/enemy.gif", 100 + (x * 50), 50 + row * 36);
-				entities.add(enemy);
-			}
-		}
+		Entity enemy = new EnemyEntity(this, "sprites/enemy.gif", 0, 360);
+		entities.add(enemy);
 	}
 	
 	/**
