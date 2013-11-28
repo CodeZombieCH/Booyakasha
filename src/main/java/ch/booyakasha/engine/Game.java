@@ -106,6 +106,10 @@ public class Game extends Canvas implements IGame {
 			g.fillRect(0, 0, 800, 600);
 			g.setColor(Color.gray);
 			g.fillRect(0, 400, 800, 140);
+			g.setColor(Color.yellow);
+			for(int i = 0; i <= 10; i++) {
+				g.fillRect(i*75, 470, 50, 3);
+			}
 			
 			// Let entities move
 			for(int i = 0; i < entities.size(); i++) {
