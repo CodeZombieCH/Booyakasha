@@ -117,11 +117,12 @@ public class Game extends Canvas implements IGame {
 			long delta = System.currentTimeMillis() - lastLoopTime;
 			lastLoopTime = System.currentTimeMillis();
 			
-			// Get hold of a graphics context for the accelerated 
-			// surface and blank it out
+			// Get graphic context
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
-			g.setColor(Color.GRAY);
+			// Draw street
+			g.setColor(new Color(168, 168, 168));
 			g.fillRect(0, 0, 800, 600);
+			// Draw buildings on both sides
 			g.setColor(new Color(139, 69, 19));
 			g.fillRect(0, 0, 50, 600);
 			g.fillRect(750, 0, 800, 600);
