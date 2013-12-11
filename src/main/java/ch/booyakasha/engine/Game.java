@@ -27,7 +27,7 @@ public class Game extends Canvas implements IGame {
 	private Entity player;
 	private GameKeyInputHandler gameKeyInputHandler;
 	
-	private MouseInput mouseInput;
+	//private MouseInput mouseInput;
 	
 	/** True if game logic needs to be applied this loop, normally as a result of a game event */
 	private boolean logicRequiredThisLoop = false;
