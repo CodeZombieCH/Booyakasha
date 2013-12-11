@@ -4,20 +4,30 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import ch.booyakasha.engine.GameKeyInputHandler.GameKeyInformation;
+
 /**
  * Game logic, including game loop
  */
 public class Game extends Canvas implements IGame {
+	/**
+	 * Cached instance of the current configuration
+	 */
+	private Configuration config;
 	private BufferStrategy strategy;
 	private boolean gameRunning = true;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private Entity player;
+	private GameKeyInputHandler gameKeyInputHandler;
+	
+	private MouseInput mouseInput;
 	
 	/** True if game logic needs to be applied this loop, normally as a result of a game event */
 	private boolean logicRequiredThisLoop = false;
@@ -26,14 +36,23 @@ public class Game extends Canvas implements IGame {
 	 * Construct our game and set it running.
 	 */
 	public Game() {
+		config = Configuration.getCurrent();
+		
+		// TODO: Switch to AWT components, mixing SWING and AWT was not a good idea
 		JFrame container = new JFrame("Booyakasha");
 		
 		JPanel panel = (JPanel)container.getContentPane();
-		panel.setPreferredSize(new Dimension(800, 600));
-		panel.setLayout(null);
+		panel.setPreferredSize(new Dimension(config.screenWidth, config.screenHeight));
+		//panel.setLayout(null);
 		
-		setBounds(0, 0, 800, 600);
+		setSize(config.screenWidth, config.screenHeight);
 		panel.add(this);
+		
+		/*
+		mouseInput = new MouseInput();
+		addMouseListener(mouseInput);
+		addMouseMotionListener(mouseInput);
+		*/
 		
 		// Tell AWT not to bother repainting our canvas since we're going to do that our self in accelerated mode
 		setIgnoreRepaint(true);
@@ -43,6 +62,10 @@ public class Game extends Canvas implements IGame {
 		container.setVisible(true);
 		
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		// Add key input handler
+		gameKeyInputHandler = new GameKeyInputHandler();
+		addKeyListener(gameKeyInputHandler);
 				
 		requestFocus();
 
@@ -97,8 +120,11 @@ public class Game extends Canvas implements IGame {
 			// Get hold of a graphics context for the accelerated 
 			// surface and blank it out
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
-			g.setColor(Color.black);
+			g.setColor(Color.GRAY);
 			g.fillRect(0, 0, 800, 600);
+			g.setColor(new Color(139, 69, 19));
+			g.fillRect(0, 0, 50, 600);
+			g.fillRect(750, 0, 800, 600);
 			
 			// Let entities move
 			for(int i = 0; i < entities.size(); i++) {
@@ -121,8 +147,30 @@ public class Game extends Canvas implements IGame {
 				logicRequiredThisLoop = false;
 			}
 			
+			// Draw mouse
+			/*
+			Point p = mouseInput.getCurrent();
+			if(p != null) {
+				g.setColor(Color.GREEN);
+				g.drawOval(p.x - 20, p.y - 20, 40, 40);
+				g.drawRect(p.x - 5, p.y - 5, 10, 10);
+			}
+			*/
+			
 			g.dispose();
 			strategy.show();
+			
+			GameKeyInformation keyInfo = gameKeyInputHandler.getKeyInformation();
+			double playerVelocity = 0;
+			if(keyInfo.isLeftPressed() && !keyInfo.isRightPressed()) {
+				// Set left velocity
+				playerVelocity = -config.playerVelocity;
+			}
+			else if(!keyInfo.isLeftPressed() && keyInfo.isRightPressed()) {
+				// Set right velocity
+				playerVelocity = config.playerVelocity;
+			}
+			player.setHorizontalMovement(playerVelocity);
 			
 			// Pause for 10ms --> 100 fps
 			try { Thread.sleep(10); } catch (Exception e) {}
@@ -131,6 +179,8 @@ public class Game extends Canvas implements IGame {
 	
 
 	public static void main(String argv[]) {
+		Configuration.setCurrent(new Configuration());
+		
 		Game game = new Game();
 		game.gameLoop();
 	}
