@@ -50,7 +50,7 @@ public class SpriteManager {
 		BufferedImage sourceImage = null;
 
 		try {
-			URL url = this.getClass().getClassLoader().getResource(reference);
+			URL url = this.getClass().getResource(reference);
 
 			if(url == null) {
 				System.err.println("Can't find resource by reference: " + reference);

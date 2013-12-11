@@ -86,13 +86,13 @@ public class Game extends Canvas implements IGame {
 	
 	private void initEntities() {
 		// Create the player object
-		player = new AliGEntity(this, "sprites/alig.gif", 370, 550);
+		player = new AliGEntity(this, "/sprites/alig.gif", 370, 550);
 		entities.add(player);
 		
 		// Create enemies
 		for(int row = 0; row < 5; row++) {
 			for(int x = 0; x < 12; x++) {
-				Entity enemy = new EnemyEntity(this, "sprites/enemy.gif", 100 + (x * 50), 50 + row * 36);
+				Entity enemy = new EnemyEntity(this, "/sprites/enemy.gif", 100 + (x * 50), 50 + row * 36);
 				entities.add(enemy);
 			}
 		}
