@@ -10,7 +10,7 @@ import ch.booyakasha.resources.SpriteManager;
 public abstract class Entity {
 	/**
 	 * The current x location of this entity
-	 */ 
+	 */
 	protected double x;
 	/**
 	 * The current y location of this entity

@@ -26,6 +26,7 @@ public class Game extends Canvas implements IGame {
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private Entity player;
 	private GameKeyInputHandler gameKeyInputHandler;
+	private long startTime;
 	
 	//private MouseInput mouseInput;
 	
@@ -82,6 +83,7 @@ public class Game extends Canvas implements IGame {
 	private void startGame() {
 		entities.clear();
 		initEntities();
+		startTime = System.currentTimeMillis();
 	}
 	
 	private void initEntities() {
@@ -90,11 +92,20 @@ public class Game extends Canvas implements IGame {
 		entities.add(player);
 		
 		// Create enemies
+		/*
 		for(int row = 0; row < 5; row++) {
 			for(int x = 0; x < 12; x++) {
 				Entity enemy = new EnemyEntity(this, "/sprites/enemy.gif", 100 + (x * 50), 50 + row * 36);
 				entities.add(enemy);
 			}
+		}
+		*/
+	}
+	
+	private void spawnEnemies(long deltaSpawn) {
+		for(int i = 0; i <= deltaSpawn / 1000; i++) {
+			Entity enemy = new EnemyEntity(this, "/sprites/enemy.gif", (int)((config.screenWidth - 2*50) * Math.random()), -50);
+			entities.add(enemy);
 		}
 	}
 	
@@ -111,6 +122,7 @@ public class Game extends Canvas implements IGame {
 	 */
 	public void gameLoop() {
 		long lastLoopTime = System.currentTimeMillis();
+		long lastSpawnTime = lastLoopTime;
 		
 		// Keep looping round until the game ends
 		while(gameRunning) {
@@ -131,6 +143,13 @@ public class Game extends Canvas implements IGame {
 			for(int i = 0; i < entities.size(); i++) {
 				Entity entity = entities.get(i);
 				entity.move(delta);
+			}
+			
+			// Spawn enemies
+			long deltaSpawn = (lastLoopTime - lastSpawnTime);
+			if(deltaSpawn / 1000 > 1) {
+				spawnEnemies(deltaSpawn);
+				lastSpawnTime = lastLoopTime;
 			}
 			
 			// Draw all entities
