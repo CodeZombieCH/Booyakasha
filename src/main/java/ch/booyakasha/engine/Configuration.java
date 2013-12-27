@@ -12,6 +12,7 @@ public class Configuration {
 	public double playerVelocity = 300;
 	public double enemyVelocity = 20;
 	public double initialEnemyVerticalVelocity = 50;
+	public double backgroundVelocity = 300;
 	
 	
 	public Configuration() {

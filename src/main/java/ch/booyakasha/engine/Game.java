@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,6 +26,9 @@ public class Game extends Canvas implements IGame {
 	private boolean gameRunning = true;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private Entity player;
+	private Entity background1;
+	private Entity background2;
+	private Random rand = new Random();
 	private GameKeyInputHandler gameKeyInputHandler;
 	private long startTime;
 	
@@ -87,6 +91,12 @@ public class Game extends Canvas implements IGame {
 	}
 	
 	private void initEntities() {
+		// Create background
+		background1 = new BackgroundEntity(this, "/sprites/background2.png", 0, -(4000 - config.screenHeight));
+		entities.add(background1);
+		background2 = new BackgroundEntity(this, "/sprites/background2.png", 0, -(4000 + 4000 - config.screenHeight));
+		entities.add(background2);
+		
 		// Create the player object
 		player = new AliGEntity(this, "/sprites/alig.gif", 370, 550);
 		entities.add(player);
