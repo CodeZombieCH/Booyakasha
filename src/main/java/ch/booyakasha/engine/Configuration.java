@@ -6,6 +6,8 @@ public class Configuration {
 	public int screenHeight = 600;
 	public int screenWidth = 800;
 	
+	public int horizontalPadding = 80;
+	
 	/**
 	 * Player velocity [pixels/sec]
 	 */

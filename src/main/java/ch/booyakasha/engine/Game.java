@@ -114,7 +114,7 @@ public class Game extends Canvas implements IGame {
 	
 	private void spawnEnemies(long deltaSpawn) {
 		for(int i = 0; i <= deltaSpawn / 1000; i++) {
-			Entity enemy = new EnemyEntity(this, "/sprites/enemy.gif", (int)((config.screenWidth - 2*50) * Math.random()), -50);
+			Entity enemy = new EnemyEntity(this, "/sprites/enemy2.png", rand.nextInt(config.screenWidth - 2*config.horizontalPadding) + config.horizontalPadding, -50);
 			entities.add(enemy);
 		}
 	}
@@ -148,7 +148,7 @@ public class Game extends Canvas implements IGame {
 			g.setColor(new Color(139, 69, 19));
 			g.fillRect(0, 0, 50, 600);
 			g.fillRect(750, 0, 800, 600);
-			
+						
 			// Let entities move
 			for(int i = 0; i < entities.size(); i++) {
 				Entity entity = entities.get(i);
