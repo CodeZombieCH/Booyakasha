@@ -92,9 +92,9 @@ public class Game extends Canvas implements IGame {
 	
 	private void initEntities() {
 		// Create background
-		background1 = new BackgroundEntity(this, "/sprites/background2.png", 0, -(4000 - config.screenHeight));
+		background1 = new BackgroundEntity(this, "/sprites/background.png", 0, -(4000 - config.screenHeight));
 		entities.add(background1);
-		background2 = new BackgroundEntity(this, "/sprites/background2.png", 0, -(4000 + 4000 - config.screenHeight));
+		background2 = new BackgroundEntity(this, "/sprites/background.png", 0, -(4000 + 4000 - config.screenHeight));
 		entities.add(background2);
 		
 		// Create the player object
