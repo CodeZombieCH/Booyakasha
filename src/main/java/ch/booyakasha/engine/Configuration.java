@@ -6,12 +6,15 @@ public class Configuration {
 	public int screenHeight = 600;
 	public int screenWidth = 800;
 	
+	public int horizontalPadding = 80;
+	
 	/**
 	 * Player velocity [pixels/sec]
 	 */
 	public double playerVelocity = 300;
 	public double enemyVelocity = 20;
 	public double initialEnemyVerticalVelocity = 50;
+	public double backgroundVelocity = 300;
 	
 	
 	public Configuration() {
