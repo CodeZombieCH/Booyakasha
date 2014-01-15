@@ -233,8 +233,19 @@ public class Game extends Canvas implements IGame {
 			// Collision detection
 			for(EnemyEntity enemy : enemyEntities) {
 				for(ShotEntity shot : shotEntities) {
+					// Avoid multiple hits
+					if(shot.hasHit()) {
+						break;
+					}
+					
 					if(enemy.collidesWith(shot)) {
+						// Spawn a blood sprite
+						entities.add(new BloodEntity(this, "/sprites/blood.png", enemy.getX() - 10, enemy.getY() - 20));
+						
+						// Request removal of enemy and shot
 						requestRemoveEntity(enemy);
+						
+						shot.markHit();
 						requestRemoveEntity(shot);
 					}
 				}

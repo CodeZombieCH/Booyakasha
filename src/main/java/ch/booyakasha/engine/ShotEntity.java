@@ -6,6 +6,7 @@ package ch.booyakasha.engine;
 public class ShotEntity extends Entity {
 	private double moveSpeed = -300;
 	private IGame game;
+	private boolean hitTarget = false;
 	
 	/**
 	 * Create a new shot
@@ -35,5 +36,13 @@ public class ShotEntity extends Entity {
 		if(y < -50) {
 			game.requestRemoveEntity(this);
 		}
+	}
+	
+	public void markHit() {
+		hitTarget = true;
+	}
+	
+	public boolean hasHit() {
+		return hitTarget;
 	}
 }

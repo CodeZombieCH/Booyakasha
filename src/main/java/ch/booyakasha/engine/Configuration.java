@@ -12,9 +12,9 @@ public class Configuration {
 	 * Player velocity [pixels/sec]
 	 */
 	public double playerVelocity = 300;
-	public double enemyVelocity = 40;
+	public double enemyVelocity = 30;
 	public double initialEnemyVerticalVelocity = 50;
-	public double backgroundVelocity = 20;
+	public double backgroundVelocity = 30;
 	
 	public int firingInterval = 300;
 	

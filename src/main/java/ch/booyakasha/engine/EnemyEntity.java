@@ -1,5 +1,7 @@
 package ch.booyakasha.engine;
 
+import ch.booyakasha.resources.SpriteManager;
+
 /**
  * The enemy objects
  */
