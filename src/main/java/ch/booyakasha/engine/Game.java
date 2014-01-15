@@ -112,7 +112,7 @@ public class Game extends Canvas implements IGame {
 	}
 	
 	private void spawnEnemies(long deltaSpawn) {
-		for(int i = 0; i <= deltaSpawn / 1000; i++) {
+		for(int i = 0; i <= deltaSpawn / 2000; i++) {
 			EnemyEntity enemy = new EnemyEntity(this, "/sprites/enemy.png", rand.nextInt(config.screenWidth - 2*config.horizontalPadding) + config.horizontalPadding, -50);
 			entities.add(enemy);
 			enemyEntities.add(enemy);
@@ -256,6 +256,9 @@ public class Game extends Canvas implements IGame {
 					Entity entity = entities.get(i);
 					entity.draw(g);
 				}
+				
+				// HACK: Draw player once more, so he is on top of everything
+				player.draw(g);
 	
 				if(logicRequiredThisLoop) {
 					for (int i=0;i<entities.size();i++) {
