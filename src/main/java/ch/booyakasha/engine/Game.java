@@ -25,6 +25,8 @@ public class Game extends Canvas implements IGame {
 	private BufferStrategy strategy;
 	private GameState state;
 	
+	private SplashScreen splashScreen = new SplashScreen();
+	
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private ArrayList<ShotEntity> shotEntities = new ArrayList<ShotEntity>();
 	private ArrayList<EnemyEntity> enemyEntities = new ArrayList<EnemyEntity>();
@@ -41,9 +43,6 @@ public class Game extends Canvas implements IGame {
 	/** Time when the last shot was fired */
 	private long lastFired;
 
-	
-	//private MouseInput mouseInput;
-	
 	/** True if game logic needs to be applied this loop, normally as a result of a game event */
 	private boolean logicRequiredThisLoop = false;
 	
@@ -57,23 +56,20 @@ public class Game extends Canvas implements IGame {
 		JFrame container = new JFrame("Booyakasha");
 		
 		JPanel panel = (JPanel)container.getContentPane();
-		panel.setPreferredSize(new Dimension(config.screenWidth, config.screenHeight));
+		//panel.setPreferredSize(new Dimension(config.screenWidth, config.screenHeight));
 		//panel.setLayout(null);
 		
-		setSize(config.screenWidth, config.screenHeight);
+		//setSize(config.screenWidth, config.screenHeight);
+		container.setPreferredSize(new Dimension(config.screenWidth, config.screenHeight));
 		panel.add(this);
 		
-		/*
-		mouseInput = new MouseInput();
-		addMouseListener(mouseInput);
-		addMouseMotionListener(mouseInput);
-		*/
 		
 		// Tell AWT not to bother repainting our canvas since we're going to do that our self in accelerated mode
 		setIgnoreRepaint(true);
 		
 		container.pack();
 		container.setResizable(false);
+		container.setLocationRelativeTo(null);
 		container.setVisible(true);
 		
 		container.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,7 +84,7 @@ public class Game extends Canvas implements IGame {
 		createBufferStrategy(2);
 		strategy = getBufferStrategy();
 		
-		startGame();
+		state = GameState.Ready;
 	}
 	
 	/**
@@ -194,101 +190,111 @@ public class Game extends Canvas implements IGame {
 			// Get graphic context
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
 			
-			if(state == GameState.Over) {
+			GameKeyInformation keyInfo = gameKeyInputHandler.getKeyInformation();
+			
+			if(state == GameState.Ready) {
+				splashScreen.render(g);
+				
+				if(keyInfo.isFirePressed()) {
+					startGame();
+				}
+			}
+			else if(state == GameState.Running) {
+				
+				/*
+				// Draw street
+				g.setColor(new Color(168, 168, 168));
+				g.fillRect(0, 0, 800, 600);
+				// Draw buildings on both sides
+				g.setColor(new Color(139, 69, 19));
+				g.fillRect(0, 0, 50, 600);
+				g.fillRect(750, 0, 800, 600);
+				*/
+							
+				// Let entities move
+				for(int i = 0; i < entities.size(); i++) {
+					Entity entity = entities.get(i);
+					entity.move(delta);
+				}
+				
+				// Spawn enemies
+				long deltaSpawn = (lastLoopTime - lastSpawnTime);
+				if(deltaSpawn / 1000 > 1) {
+					spawnEnemies(deltaSpawn);
+					lastSpawnTime = lastLoopTime;
+				}
+				
+				// Collision detection
+				for(EnemyEntity enemy : enemyEntities) {
+					for(ShotEntity shot : shotEntities) {
+						// Avoid multiple hits
+						if(shot.hasHit()) {
+							break;
+						}
+						
+						if(enemy.collidesWith(shot)) {
+							// Spawn a blood sprite
+							entities.add(new BloodEntity(this, "/sprites/blood.png", enemy.getX() - 10, enemy.getY() - 20));
+							
+							// Request removal of enemy and shot
+							requestRemoveEntity(enemy);
+							
+							shot.markHit();
+							requestRemoveEntity(shot);
+						}
+					}
+				}
+	
+				
+				// Remove all requested entities
+				performRemoveEntity();
+				
+				
+				// Draw all entities
+				for(int i = 0; i < entities.size(); i++) {
+					Entity entity = entities.get(i);
+					entity.draw(g);
+				}
+	
+				if(logicRequiredThisLoop) {
+					for (int i=0;i<entities.size();i++) {
+						Entity entity = entities.get(i);
+						entity.doLogic();
+					}
+					
+					logicRequiredThisLoop = false;
+				}
+				
+				// Handle user input
+				double playerVelocity = 0;
+				if(keyInfo.isLeftPressed() && !keyInfo.isRightPressed()) {
+					// Set left velocity
+					playerVelocity = -config.playerVelocity;
+				}
+				else if(!keyInfo.isLeftPressed() && keyInfo.isRightPressed()) {
+					// Set right velocity
+					playerVelocity = config.playerVelocity;
+				}
+				player.setHorizontalMovement(playerVelocity);
+				
+				if(keyInfo.isFirePressed()) {
+					tryToFire();
+				}
+			}
+			else if(state == GameState.Over) {
 				String message = "GAME OVER";
 				
 				g.setFont(new Font("Monospaced", Font.BOLD, 56)); 
 				g.setColor(Color.RED);
 				g.drawString(message, (800 - g.getFontMetrics().stringWidth(message)) / 2, 250);
 				
-				g.dispose();
-				strategy.show();
-				
-				try { Thread.sleep(10); } catch (Exception e) {}
-			}
-			
-			/*
-			// Draw street
-			g.setColor(new Color(168, 168, 168));
-			g.fillRect(0, 0, 800, 600);
-			// Draw buildings on both sides
-			g.setColor(new Color(139, 69, 19));
-			g.fillRect(0, 0, 50, 600);
-			g.fillRect(750, 0, 800, 600);
-			*/
-						
-			// Let entities move
-			for(int i = 0; i < entities.size(); i++) {
-				Entity entity = entities.get(i);
-				entity.move(delta);
-			}
-			
-			// Spawn enemies
-			long deltaSpawn = (lastLoopTime - lastSpawnTime);
-			if(deltaSpawn / 1000 > 1) {
-				spawnEnemies(deltaSpawn);
-				lastSpawnTime = lastLoopTime;
-			}
-			
-			// Collision detection
-			for(EnemyEntity enemy : enemyEntities) {
-				for(ShotEntity shot : shotEntities) {
-					// Avoid multiple hits
-					if(shot.hasHit()) {
-						break;
-					}
-					
-					if(enemy.collidesWith(shot)) {
-						// Spawn a blood sprite
-						entities.add(new BloodEntity(this, "/sprites/blood.png", enemy.getX() - 10, enemy.getY() - 20));
-						
-						// Request removal of enemy and shot
-						requestRemoveEntity(enemy);
-						
-						shot.markHit();
-						requestRemoveEntity(shot);
-					}
+				if(keyInfo.isFirePressed()) {
+					System.exit(0);
 				}
-			}
-
-			
-			// Remove all requested entities
-			performRemoveEntity();
-			
-			
-			// Draw all entities
-			for(int i = 0; i < entities.size(); i++) {
-				Entity entity = entities.get(i);
-				entity.draw(g);
-			}
-
-			if(logicRequiredThisLoop) {
-				for (int i=0;i<entities.size();i++) {
-					Entity entity = entities.get(i);
-					entity.doLogic();
-				}
-				
-				logicRequiredThisLoop = false;
 			}
 			
 			g.dispose();
 			strategy.show();
-			
-			GameKeyInformation keyInfo = gameKeyInputHandler.getKeyInformation();
-			double playerVelocity = 0;
-			if(keyInfo.isLeftPressed() && !keyInfo.isRightPressed()) {
-				// Set left velocity
-				playerVelocity = -config.playerVelocity;
-			}
-			else if(!keyInfo.isLeftPressed() && keyInfo.isRightPressed()) {
-				// Set right velocity
-				playerVelocity = config.playerVelocity;
-			}
-			player.setHorizontalMovement(playerVelocity);
-			
-			if(keyInfo.isFirePressed()) {
-				tryToFire();
-			}
 			
 			// Pause for 10ms --> 100 fps
 			try { Thread.sleep(10); } catch (Exception e) {}
