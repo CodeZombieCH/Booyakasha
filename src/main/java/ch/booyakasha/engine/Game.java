@@ -101,7 +101,7 @@ public class Game extends Canvas implements IGame {
 		entities.add(background2);
 		
 		// Create the player object
-		player = new AliGEntity(this, "/sprites/alig.gif", 370, 550);
+		player = new AliGEntity(this, "/sprites/alig.gif", 370, 500);
 		entities.add(player);
 	}
 	
