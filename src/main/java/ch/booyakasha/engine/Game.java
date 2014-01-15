@@ -3,6 +3,7 @@ package ch.booyakasha.engine;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
@@ -22,8 +23,14 @@ public class Game extends Canvas implements IGame {
 	 */
 	private Configuration config;
 	private BufferStrategy strategy;
-	private boolean gameRunning = true;
+	private GameState state;
+	
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
+	private ArrayList<ShotEntity> shotEntities = new ArrayList<ShotEntity>();
+	private ArrayList<EnemyEntity> enemyEntities = new ArrayList<EnemyEntity>();
+	
+	private ArrayList<Entity> requestRemoveEntities = new ArrayList<Entity>();
+	
 	private Entity player;
 	private Entity background1;
 	private Entity background2;
@@ -91,6 +98,7 @@ public class Game extends Canvas implements IGame {
 		entities.clear();
 		initEntities();
 		startTime = System.currentTimeMillis();
+		state = GameState.Running;
 	}
 	
 	private void initEntities() {
@@ -107,13 +115,43 @@ public class Game extends Canvas implements IGame {
 	
 	private void spawnEnemies(long deltaSpawn) {
 		for(int i = 0; i <= deltaSpawn / 1000; i++) {
-			Entity enemy = new EnemyEntity(this, "/sprites/enemy.png", rand.nextInt(config.screenWidth - 2*config.horizontalPadding) + config.horizontalPadding, -50);
+			EnemyEntity enemy = new EnemyEntity(this, "/sprites/enemy.png", rand.nextInt(config.screenWidth - 2*config.horizontalPadding) + config.horizontalPadding, -50);
 			entities.add(enemy);
+			enemyEntities.add(enemy);
 		}
 	}
 	
-	public void removeEntity(Entity entity) {
+	/**
+	 * Request removal of an entity
+	 * @param entity Entity to remove in the game loop
+	 */
+	public void requestRemoveEntity(Entity entity) {
+		requestRemoveEntities.add(entity);
+	}
+	
+	/**
+	 * Apply removal requests
+	 */
+	public void performRemoveEntity() {
+		for(Entity entity : requestRemoveEntities) {
+			removeEntity(entity);
+		}
+	}
+	
+	/**
+	 * Remove entity
+	 * @param entity Entity to remove
+	 */
+	private void removeEntity(Entity entity) {
 		entities.remove(entity);
+		
+		if(entity instanceof EnemyEntity) {
+			enemyEntities.remove(entity);
+		}
+		
+		if(entity instanceof ShotEntity) {
+			shotEntities.remove(entity);
+		}
 	}
 	
 	public void tryToFire() {
@@ -126,6 +164,7 @@ public class Game extends Canvas implements IGame {
 		lastFired = System.currentTimeMillis();
 		ShotEntity shot = new ShotEntity(this, "/sprites/shot.gif", player.getX() + 35, player.getY() - 5);
 		entities.add(shot);
+		shotEntities.add(shot);
 	}
 	
 	/**
@@ -133,6 +172,10 @@ public class Game extends Canvas implements IGame {
 	 */
 	public void updateLogic() {
 		logicRequiredThisLoop = true;
+	}
+	
+	public void triggerGameOver() {
+		state = GameState.Over;
 	}
 
 	
@@ -144,12 +187,25 @@ public class Game extends Canvas implements IGame {
 		long lastSpawnTime = lastLoopTime;
 		
 		// Keep looping round until the game ends
-		while(gameRunning) {
+		while(true) {
 			long delta = System.currentTimeMillis() - lastLoopTime;
 			lastLoopTime = System.currentTimeMillis();
 			
 			// Get graphic context
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
+			
+			if(state == GameState.Over) {
+				String message = "GAME OVER";
+				
+				g.setFont(new Font("Monospaced", Font.BOLD, 56)); 
+				g.setColor(Color.RED);
+				g.drawString(message, (800 - g.getFontMetrics().stringWidth(message)) / 2, 250);
+				
+				g.dispose();
+				strategy.show();
+				
+				try { Thread.sleep(10); } catch (Exception e) {}
+			}
 			
 			/*
 			// Draw street
@@ -173,6 +229,21 @@ public class Game extends Canvas implements IGame {
 				spawnEnemies(deltaSpawn);
 				lastSpawnTime = lastLoopTime;
 			}
+			
+			// Collision detection
+			for(EnemyEntity enemy : enemyEntities) {
+				for(ShotEntity shot : shotEntities) {
+					if(enemy.collidesWith(shot)) {
+						requestRemoveEntity(enemy);
+						requestRemoveEntity(shot);
+					}
+				}
+			}
+
+			
+			// Remove all requested entities
+			performRemoveEntity();
+			
 			
 			// Draw all entities
 			for(int i = 0; i < entities.size(); i++) {

@@ -1,6 +1,8 @@
 package ch.booyakasha.engine;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
+
 import ch.booyakasha.resources.Sprite;
 import ch.booyakasha.resources.SpriteManager;
 
@@ -42,6 +44,8 @@ public abstract class Entity {
 		this.x = x;
 		this.y = y;
 	}
+	
+
 	
 	public void move(long delta) {
 		// update the location of the entity based on move speeds
@@ -102,5 +106,20 @@ public abstract class Entity {
 	 * Do the logic associated with this entity. This method will be called periodically based on game events
 	 */
 	public void doLogic() {
+	}
+	
+	/**
+	 * Check if this entity collides with another
+	 * 
+	 * @param other The other entity to check collision against
+	 * @return True if the entities collide with each other, false if not
+	 */
+	public boolean collidesWith(Entity other) {
+		return getBounds().intersects(other.getBounds());
+	}
+	
+	
+	private Rectangle getBounds() {
+		return new Rectangle((int)x, (int)y, sprite.getWidth(),sprite.getHeight());
 	}
 }

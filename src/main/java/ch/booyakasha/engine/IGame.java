@@ -6,5 +6,7 @@ public interface IGame {
 	 */
 	void updateLogic();
 
-	void removeEntity(Entity entity);
+	void requestRemoveEntity(Entity entity);
+	
+	void triggerGameOver();
 }

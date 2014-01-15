@@ -18,9 +18,10 @@ public class EnemyEntity extends Entity {
 	 */
 	public void move(long delta) {
 		super.move(delta);
-	}
-
-	public void doLogic() {
-		//dx = -dx;
+		
+		// If the enemy reached the bottom of the screen, request game over
+		if(y > Configuration.getCurrent().screenHeight - 32) {
+			game.triggerGameOver();
+		}
 	}
 }
