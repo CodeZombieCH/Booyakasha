@@ -39,6 +39,7 @@ public class Game extends Canvas implements IGame {
 	private Random rand = new Random();
 	private GameKeyInputHandler gameKeyInputHandler;
 	private long startTime;
+	private long lastSpawnTime;
 	
 	/** Time when the last shot was fired */
 	private long lastFired;
@@ -95,6 +96,7 @@ public class Game extends Canvas implements IGame {
 		initEntities();
 		startTime = System.currentTimeMillis();
 		state = GameState.Running;
+		lastSpawnTime = startTime;
 	}
 	
 	private void initEntities() {
@@ -180,7 +182,6 @@ public class Game extends Canvas implements IGame {
 	 */
 	public void gameLoop() {
 		long lastLoopTime = System.currentTimeMillis();
-		long lastSpawnTime = lastLoopTime;
 		
 		// Keep looping round until the game ends
 		while(true) {

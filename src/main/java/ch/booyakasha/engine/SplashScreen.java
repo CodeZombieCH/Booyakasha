@@ -29,11 +29,11 @@ public class SplashScreen {
 			String message = "PRESS [SPACE] TO START";
 			
 			g.setFont(new Font("Monospaced", Font.BOLD, 24)); 
-			g.setColor(new Color(236, 184, 19));
+			g.setColor(new Color(251, 210, 120));
 			g.drawString(
 					message,
 					(Configuration.getCurrent().screenWidth - g.getFontMetrics().stringWidth(message)) / 2,
-					Configuration.getCurrent().screenHeight - 30);
+					Configuration.getCurrent().screenHeight - 50);
 		}
 	}
 }
