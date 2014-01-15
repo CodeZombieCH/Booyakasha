@@ -4,7 +4,6 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Random;
@@ -31,6 +30,10 @@ public class Game extends Canvas implements IGame {
 	private Random rand = new Random();
 	private GameKeyInputHandler gameKeyInputHandler;
 	private long startTime;
+	
+	/** Time when the last shot was fired */
+	private long lastFired;
+
 	
 	//private MouseInput mouseInput;
 	
@@ -100,16 +103,6 @@ public class Game extends Canvas implements IGame {
 		// Create the player object
 		player = new AliGEntity(this, "/sprites/alig.gif", 370, 550);
 		entities.add(player);
-		
-		// Create enemies
-		/*
-		for(int row = 0; row < 5; row++) {
-			for(int x = 0; x < 12; x++) {
-				Entity enemy = new EnemyEntity(this, "/sprites/enemy.gif", 100 + (x * 50), 50 + row * 36);
-				entities.add(enemy);
-			}
-		}
-		*/
 	}
 	
 	private void spawnEnemies(long deltaSpawn) {
@@ -117,6 +110,22 @@ public class Game extends Canvas implements IGame {
 			Entity enemy = new EnemyEntity(this, "/sprites/enemy.png", rand.nextInt(config.screenWidth - 2*config.horizontalPadding) + config.horizontalPadding, -50);
 			entities.add(enemy);
 		}
+	}
+	
+	public void removeEntity(Entity entity) {
+		entities.remove(entity);
+	}
+	
+	public void tryToFire() {
+		// Check for another shot fired within the firing interval
+		if(System.currentTimeMillis() - lastFired < config.firingInterval) {
+			return;
+		}
+		
+		// All fine, fire a shot
+		lastFired = System.currentTimeMillis();
+		ShotEntity shot = new ShotEntity(this, "/sprites/shot.gif", player.getX() + 35, player.getY() - 5);
+		entities.add(shot);
 	}
 	
 	/**
@@ -141,6 +150,8 @@ public class Game extends Canvas implements IGame {
 			
 			// Get graphic context
 			Graphics2D g = (Graphics2D)strategy.getDrawGraphics();
+			
+			/*
 			// Draw street
 			g.setColor(new Color(168, 168, 168));
 			g.fillRect(0, 0, 800, 600);
@@ -148,6 +159,7 @@ public class Game extends Canvas implements IGame {
 			g.setColor(new Color(139, 69, 19));
 			g.fillRect(0, 0, 50, 600);
 			g.fillRect(750, 0, 800, 600);
+			*/
 						
 			// Let entities move
 			for(int i = 0; i < entities.size(); i++) {
@@ -177,16 +189,6 @@ public class Game extends Canvas implements IGame {
 				logicRequiredThisLoop = false;
 			}
 			
-			// Draw mouse
-			/*
-			Point p = mouseInput.getCurrent();
-			if(p != null) {
-				g.setColor(Color.GREEN);
-				g.drawOval(p.x - 20, p.y - 20, 40, 40);
-				g.drawRect(p.x - 5, p.y - 5, 10, 10);
-			}
-			*/
-			
 			g.dispose();
 			strategy.show();
 			
@@ -201,6 +203,10 @@ public class Game extends Canvas implements IGame {
 				playerVelocity = config.playerVelocity;
 			}
 			player.setHorizontalMovement(playerVelocity);
+			
+			if(keyInfo.isFirePressed()) {
+				tryToFire();
+			}
 			
 			// Pause for 10ms --> 100 fps
 			try { Thread.sleep(10); } catch (Exception e) {}

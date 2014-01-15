@@ -16,6 +16,8 @@ public class Configuration {
 	public double initialEnemyVerticalVelocity = 50;
 	public double backgroundVelocity = 20;
 	
+	public int firingInterval = 300;
+	
 	
 	public Configuration() {
 		
