@@ -40,6 +40,8 @@ public class Game extends Canvas implements IGame {
 	private GameKeyInputHandler gameKeyInputHandler;
 	private long startTime;
 	private long lastSpawnTime;
+	private int killhit = 0;
+	
 	
 	/** Time when the last shot was fired */
 	private long lastFired;
@@ -240,6 +242,8 @@ public class Game extends Canvas implements IGame {
 							// Request removal of enemy and shot
 							requestRemoveEntity(enemy);
 							
+							killhit++;
+							
 							shot.markHit();
 							requestRemoveEntity(shot);
 						}
@@ -286,7 +290,7 @@ public class Game extends Canvas implements IGame {
 				}
 			}
 			else if(state == GameState.Over) {
-				String message = "GAME OVER";
+				String message = "GAME OVER " + killhit + " hits";
 				
 				g.setFont(new Font("Monospaced", Font.BOLD, 56)); 
 				g.setColor(Color.RED);
